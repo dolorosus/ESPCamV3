@@ -83,7 +83,7 @@ void setup()
   String ssid;
   String pass;
   pref.begin(MYNAME, false);
-  
+
   // Serial.print("freeEntries()_:");
   // Serial.println( pref.freeEntries());;
 
@@ -96,10 +96,14 @@ void setup()
 
     while (!SerialBT.connected(1000))
     {
-
+      digitalWrite(RED_BACKSIDE_LED,LOW);
+      sleep(250);
+      digitalWrite(RED_BACKSIDE_LED,HIGH);
       Serial.print("Bluetooth waiting for connect. My name_:");
       Serial.println(MYNAME);
     }
+
+    digitalWrite(RED_BACKSIDE_LED,HIGH);
 
     int client_wifi_ssid_id = 0;
     int n = wifiScanNetworks();
