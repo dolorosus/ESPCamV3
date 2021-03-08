@@ -34,7 +34,12 @@
 
 //
 #define MYNAME "ESPCAM02"
-#define MYVERSION "FW:V3-202103081300"
+#define MYVERSION "FW:V3-202103081700"
+//
+// AiTinker specific
+//
+#define RED_BACKSIDE_LED 33
+#define FLASHLIGHT_LED    4
 
 BluetoothSerial SerialBT;
 
@@ -53,6 +58,10 @@ int wifistat = 0;
 
 void setup()
 {
+  // RED LED on backside off
+  pinMode (RED_BACKSIDE_LED, OUTPUT);
+  digitalWrite(RED_BACKSIDE_LED,HIGH);
+
   Serial.begin(115200);
   Serial.setDebugOutput(true);
   Serial.println();
@@ -72,13 +81,19 @@ void setup()
   {
     while (WiFi.status() != WL_CONNECTED)
     {
+      digitalWrite(RED_BACKSIDE_LED,LOW);
+
       if (!SerialBT.begin(MYNAME))
         Serial.println("Starting bluetooth failed.");
 
-      while (!SerialBT.connected(5000))
+      while (!SerialBT.connected(1000))
       {
+        delay(500);
+        digitalWrite(RED_BACKSIDE_LED,LOW);
         Serial.print("Bluetooth waiting for connect. My name_:");
         Serial.println(MYNAME);
+        delay(500);
+        digitalWrite(RED_BACKSIDE_LED,HIGH);
       }
 
       int client_wifi_ssid_id = 0;
@@ -175,8 +190,12 @@ bool wifiConnect(long timeout)
 
   while (WiFi.status() != WL_CONNECTED)
   {
-    delay(500);
+    digitalWrite(RED_BACKSIDE_LED,LOW);
+    delay(250);
     Serial.print(".");
+    digitalWrite(RED_BACKSIDE_LED,HIGH);
+    delay(250);
+
     if (millis() - start_wifi_millis > timeout)
     {
       WiFi.disconnect(true, true);
