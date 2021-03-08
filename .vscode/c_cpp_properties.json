@@ -10,6 +10,7 @@
             "includePath": [
                 "z:/la/GitHub/ESPCamV3/include",
                 "z:/la/GitHub/ESPCamV3/src",
+                "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/Preferences/src",
                 "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/ESPmDNS/src",
                 "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src",
                 "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/BluetoothSerial/src",
@@ -90,7 +91,6 @@
                 "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/HTTPUpdate/src",
                 "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/HTTPUpdateServer/src",
                 "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/NetBIOS/src",
-                "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/Preferences/src",
                 "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/SD/src",
                 "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/SD_MMC/src",
                 "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/SPI/src",
@@ -110,6 +110,7 @@
                 "path": [
                     "z:/la/GitHub/ESPCamV3/include",
                     "z:/la/GitHub/ESPCamV3/src",
+                    "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/Preferences/src",
                     "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/ESPmDNS/src",
                     "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src",
                     "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/BluetoothSerial/src",
@@ -190,7 +191,6 @@
                     "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/HTTPUpdate/src",
                     "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/HTTPUpdateServer/src",
                     "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/NetBIOS/src",
-                    "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/Preferences/src",
                     "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/SD/src",
                     "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/SD_MMC/src",
                     "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/SPI/src",

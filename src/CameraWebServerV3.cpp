@@ -3,15 +3,25 @@
 #include <WiFi.h>
 #include <ESPmDNS.h>
 #include "esp_camera.h"
+#include <Preferences.h>
 
 #include "BluetoothSerial.h"
 #include <String.h>
+
+
+
+#ifdef NVINIT
+#include "nvs_flash.h"
+#include "nvs.h"
+#endif
 
 //
 // WARNING!!! PSRAM IC required for UXGA resolution and high JPEG quality
 //            Ensure ESP32 Wrover Module or other board with PSRAM is selected
 //            Partial images will be transmitted if image exceeds buffer size
 //
+
+// cleaning :       pio run --target erase
 
 // C:\Users\la\.platformio\packages\framework-arduinoespressif32\tools\partitions\huge_app2.csv:
 //
@@ -34,13 +44,14 @@
 
 //
 #define MYNAME "ESPCAM02"
-#define MYVERSION "FW:V3-202103081700"
+#define MYVERSION "FW:V3-202103082200"
 //
 // AiTinker specific
 //
 #define RED_BACKSIDE_LED 33
 #define FLASHLIGHT_LED    4
 
+Preferences pref;
 BluetoothSerial SerialBT;
 
 String ssids_array[50];
@@ -71,67 +82,67 @@ void setup()
 
   String ssid;
   String pass;
-
+  pref.begin(MYNAME, false);
+  
   // Serial.print("freeEntries()_:");
   // Serial.println( pref.freeEntries());;
 
   //Try WiFi connect
   // if not successful, ask for ssid and passwword via Bluetooth
-  if (!wifiConnect(30000))
+  while (!wifiConnect(60000))
   {
-    while (WiFi.status() != WL_CONNECTED)
+    if (!SerialBT.begin(MYNAME))
+      Serial.println("Starting bluetooth failed.");
+
+    while (!SerialBT.connected(1000))
     {
-      digitalWrite(RED_BACKSIDE_LED,LOW);
 
-      if (!SerialBT.begin(MYNAME))
-        Serial.println("Starting bluetooth failed.");
-
-      while (!SerialBT.connected(1000))
-      {
-        delay(500);
-        digitalWrite(RED_BACKSIDE_LED,LOW);
-        Serial.print("Bluetooth waiting for connect. My name_:");
-        Serial.println(MYNAME);
-        delay(500);
-        digitalWrite(RED_BACKSIDE_LED,HIGH);
-      }
-
-      int client_wifi_ssid_id = 0;
-      int n = wifiScanNetworks();
-
-      if (n == 0)
-      {
-        SerialBT.println("No networks found. Givig up.");
-        return;
-      }
-
-      // Ask for SSID until a valid index has been choosen
-      while (client_wifi_ssid_id < 1 || client_wifi_ssid_id > n)
-      {
-        SerialBT.println();
-        SerialBT.print("Enter SSID number:");
-        client_wifi_ssid_id = BTinp().toInt();
-        SerialBT.print("Client_wifi_ssid_id:");
-        SerialBT.println(client_wifi_ssid_id);
-      }
-
-      ssid = ssids_array[client_wifi_ssid_id];
-      SerialBT.printf("SSID_:%s\n", ssid.c_str());
-
-      //ask for password
-      SerialBT.println();
-      SerialBT.println("Enter pass:");
-      pass = BTinp();
-      SerialBT.printf("PASS_:%s\n", pass.c_str());
-
-      WiFi.persistent(true);
-      SerialBT.println("WiFi connect. Wait up to 20 s");
-      WiFi.begin(ssid.c_str(), pass.c_str());
-      delay(20);
+      Serial.print("Bluetooth waiting for connect. My name_:");
+      Serial.println(MYNAME);
     }
-    SerialBT.println("Connect to WiFi ok. Bluetooth no longer needed. Disconnecting");
+
+    int client_wifi_ssid_id = 0;
+    int n = wifiScanNetworks();
+
+    if (n == 0)
+    {
+      SerialBT.println("No networks found. Givig up.");
+      return;
+    }
+
+    // Ask for SSID until a valid index has been choosen
+    while (client_wifi_ssid_id < 1 || client_wifi_ssid_id > n)
+    {
+      SerialBT.println();
+      SerialBT.print("Enter SSID number:");
+      client_wifi_ssid_id = BTinp().toInt();
+      SerialBT.print("Client_wifi_ssid_id:");
+      SerialBT.println(client_wifi_ssid_id);
+    }
+
+    ssid = ssids_array[client_wifi_ssid_id];
+    SerialBT.printf("SSID_:%s\n", ssid.c_str());
+
+    //ask for password
+    SerialBT.println();
+    SerialBT.println("Enter pass:");
+    pass = BTinp();
+    SerialBT.printf("PASS_:%s\n", pass.c_str());
+
+    // store SSID and passwd to NVRAM
+    pref.putString("ssid", ssid.c_str());
+    pref.putString("pass", pass.c_str());
+
+    // reread from NVRAM to be shure everything is in place
+    Serial.println("Stored values:");
+    Serial.print("ssid_:");
+    Serial.println(pref.getString("ssid", "DEFAULT"));
+    Serial.print("pass_:");
+    Serial.println(pref.getString("pass", "DEFAULT"));
+
+    SerialBT.println("Bluetooth no longer needed. Disconnecting");
     SerialBT.disconnect();
-    Serial.println("Restarting ESP");
+    Serial.println("Closing bluetooth connection");
     //
     //    SerialBT.end(); will cause the ESP to hang
     //    so restart will work as workaround
@@ -143,6 +154,7 @@ void setup()
   Serial.println(WiFi.SSID());
   Serial.print("IP_:");
   Serial.println(WiFi.localIP());
+
 
   if (!MDNS.begin(MYNAME))
     Serial.println("Error setting up MDNS responder!");
@@ -178,23 +190,28 @@ void loop()
 
 bool wifiConnect(long timeout)
 {
-
   long start_wifi_millis;
 
-  WiFi.persistent(true);
+  String tmp_pref_ssid = pref.getString("ssid");
+  String tmp_pref_pass = pref.getString("pass");
+
+  const char *pref_ssid = tmp_pref_ssid.c_str();
+  const char *pref_pass = tmp_pref_pass.c_str();
+
+  WiFi.persistent(false);
   WiFi.disconnect(true, true);
   WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE);
 
   start_wifi_millis = millis();
-  WiFi.begin();
+  WiFi.begin(pref_ssid, pref_pass);
 
   while (WiFi.status() != WL_CONNECTED)
   {
     digitalWrite(RED_BACKSIDE_LED,LOW);
-    delay(250);
+    delay(125);
     Serial.print(".");
     digitalWrite(RED_BACKSIDE_LED,HIGH);
-    delay(250);
+    delay(125);
 
     if (millis() - start_wifi_millis > timeout)
     {
@@ -357,3 +374,21 @@ void WIFIPrintStatus(int status)
     break;
   }
 }
+
+#ifdef NVINIT
+void nvinit()
+{
+
+  Serial.println("flash init");
+  esp_err_t err = nvs_flash_init();
+  if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND)
+  {
+    NVS partition was truncated and needs to be erased
+        Retry nvs_flash_init
+            ESP_ERROR_CHECK(nvs_flash_erase());
+    err = nvs_flash_init();
+  }
+  ESP_ERROR_CHECK(err);
+  Serial.printf("nvs_flash_init()_:%i", err);
+}
+#endif
