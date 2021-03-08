@@ -114,7 +114,7 @@ void setup()
       WiFi.begin(ssid.c_str(), pass.c_str());
       delay(20);
     }
-    SerialBT.println("Bluetooth no longer needed. Disconnecting");
+    SerialBT.println("Connect to WiFi ok. Bluetooth no longer needed. Disconnecting");
     SerialBT.disconnect();
     Serial.println("Restarting ESP");
     //
@@ -148,7 +148,7 @@ void loop()
 
   if (WiFi.status() != WL_CONNECTED)
   {
-    wifiConnect(60000);
+    wifiConnect(45000);
     i++;
     if (i > 5)
       ESP.restart();
@@ -259,7 +259,6 @@ void cameraInit()
 
 int wifiScanNetworks()
 {
-
   WiFi.mode(WIFI_STA);
   // WiFi.scanNetworks will return the number of networks found
   int n = WiFi.scanNetworks();
@@ -291,7 +290,6 @@ int wifiScanNetworks()
 
 String BTinp()
 {
-
   String inp = "";
 
   while (true)
