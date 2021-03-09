@@ -40,7 +40,6 @@
 //
 #define RED_BACKSIDE_LED 33
 #define FLASHLIGHT_LED 4
-
 //#define CAMERA_MODEL_TTGO_T_JOURNAL // No PSRAM
 
 #include "camera_pins.h"

@@ -11,6 +11,15 @@ setup() {
     export interval=${2:-15}s
     export dest=${3:-"/mnt/USB64/capture"}
     export CAM=ESPCAM${camidx}
+    
+    #  No time restriction (capture always)
+    #
+    export always=on
+
+    # Capture only from 06:00 to 20:30
+    #
+    # export from=060000
+    # export to=203000
 
     [ -f ${dest}/.personal_settings ] && . ${dest}/.personal_settings 
 }
@@ -25,9 +34,9 @@ cat<<EOF
         interval =  15
         destdir  =  ${dest}
           
-    ${myname}     will record from ESPCAM00 (Default for camidx is 00)
-    ${myname} 01  will record from ESPCAM01
-    ${myname} 02 10 on /tmp  will record from ESPCAM02 one picture every 10 seconds to /tmp 
+    ${myname}               will record from ESPCAM00 (Default for camidx is 00)
+    ${myname} 01            will record from ESPCAM01
+    ${myname} 02 10 /tmp    will record from ESPCAM02 one picture every 10 seconds to /tmp 
 EOF
 exit 0
 }
@@ -74,16 +83,6 @@ setcampar() {
 [ ${1}"x" = "--usagex" ] && usage
 
 setup
-
-#  No time restriction (capture always)
-#
-# export always=on
-
-# 
-# Capture only from 06:00 to 20:30
-#
-export from=060000
-export to=203000
 #
 # capture frames.
 
