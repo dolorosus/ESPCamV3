@@ -43,22 +43,26 @@
 #include "camera_pins.h"
 
 //
-#define MYNAME "ESPCAM02"
-#define MYVERSION "FW:V3-202103082200"
+#define MYNAME "ESPCAM00"
+#define MYVERSION "FW:V3-202103091800"
 //
 // AiTinker specific
 //
 #define RED_BACKSIDE_LED 33
 #define FLASHLIGHT_LED    4
 
+uint8_t LEDSTAT=0x0;
+
 Preferences pref;
 BluetoothSerial SerialBT;
+
 
 String ssids_array[50];
 String network_string;
 
 String BTinp();
 int wifiScanNetworks();
+
 
 void startCameraServer();
 bool wifiConnect(long timeout);
@@ -89,17 +93,22 @@ void setup()
 
   //Try WiFi connect
   // if not successful, ask for ssid and passwword via Bluetooth
-  while (!wifiConnect(60000))
+  while (!wifiConnect(40000))
   {
-    if (!SerialBT.begin(MYNAME))
-      Serial.println("Starting bluetooth failed.");
 
-    while (!SerialBT.connected(1000))
+    if (!SerialBT.begin(MYNAME)) {
+      Serial.println("Starting bluetooth failed.");
+      ESP.restart();
+    }
+
+    LEDSTAT=LOW;
+    digitalWrite(RED_BACKSIDE_LED,LEDSTAT);
+    Serial.println("Bluetooth waiting for connect. My name_:");
+    while (!SerialBT.connected(5000))
     {
-      digitalWrite(RED_BACKSIDE_LED,LOW);
-      sleep(250);
-      digitalWrite(RED_BACKSIDE_LED,HIGH);
-      Serial.print("Bluetooth waiting for connect. My name_:");
+    LEDSTAT=(LEDSTAT == LOW) ? HIGH : LOW;
+    digitalWrite(RED_BACKSIDE_LED,LEDSTAT);
+      Serial.print("#");
       Serial.println(MYNAME);
     }
 
