@@ -39,16 +39,14 @@
 // AiTinker specific
 //
 #define RED_BACKSIDE_LED 33
-#define FLASHLIGHT_LED    4
+#define FLASHLIGHT_LED 4
 
 //#define CAMERA_MODEL_TTGO_T_JOURNAL // No PSRAM
-
 
 #include "camera_pins.h"
 
 #define MYNAME "ESPCAM00"
 #define MYVERSION "FW:V3-202103091800"
-
 
 Preferences pref;
 BluetoothSerial SerialBT;
@@ -63,15 +61,13 @@ void startCameraServer();
 bool wifiConnect(long timeout);
 void WIFIPrintStatus(int status);
 void cameraInit();
-
-uint8_t LEDSTAT=0x0;
-int wifistat = 0;
+void digitalToggle(uint8_t PIN);
 
 void setup()
 {
   // RED LED on backside off
-  pinMode (RED_BACKSIDE_LED, OUTPUT);
-  digitalWrite(RED_BACKSIDE_LED,HIGH);
+  pinMode(RED_BACKSIDE_LED, OUTPUT);
+  digitalWrite(RED_BACKSIDE_LED, HIGH);
 
   Serial.begin(115200);
   Serial.setDebugOutput(true);
@@ -91,24 +87,22 @@ void setup()
   // if not successful, ask for ssid and passwword via Bluetooth
   while (!wifiConnect(40000))
   {
-
-    if (!SerialBT.begin(MYNAME)) {
+    if (!SerialBT.begin(MYNAME))
+    {
       Serial.println("Starting bluetooth failed.");
       ESP.restart();
     }
 
-    LEDSTAT=LOW;
-    digitalWrite(RED_BACKSIDE_LED,LEDSTAT);
+    digitalToggle(RED_BACKSIDE_LED);
     Serial.println("Bluetooth waiting for connect. My name_:");
     while (!SerialBT.connected(5000))
     {
-      LEDSTAT=(LEDSTAT == LOW) ? HIGH : LOW;
-      digitalWrite(RED_BACKSIDE_LED,LEDSTAT);
+      digitalToggle(RED_BACKSIDE_LED);
       Serial.print("#");
       Serial.println(MYNAME);
     }
 
-    digitalWrite(RED_BACKSIDE_LED,HIGH);
+    digitalWrite(RED_BACKSIDE_LED, HIGH);
 
     int client_wifi_ssid_id = 0;
     int n = wifiScanNetworks();
@@ -157,7 +151,6 @@ void setup()
     //    so restart will work as workaround
     ESP.restart();
   }
-
   // at this point the network should be connected
   Serial.print("Connected to_:");
   Serial.println(WiFi.SSID());
@@ -173,6 +166,7 @@ void setup()
   Serial.println(WiFi.localIP());
   Serial.printf("\nRecording:\n\tffmpeg -re -f mjpeg -t 300 -i http://%s:81/stream   -an -c:v libx265 -crf 29 -preset fast <OUTPUTFILE>", MYNAME);
   Serial.printf("\nCapture frame:\n\tcurl http://%s/capture  --output <OUTPUTFILE>\n\n", MYNAME);
+  digitalWrite(RED_BACKSIDE_LED, HIGH);
 }
 
 void loop()
@@ -193,42 +187,6 @@ void loop()
     i = 0;
   }
   delay(10000);
-}
-
-bool wifiConnect(long timeout)
-{
-  long start_wifi_millis;
-
-  String tmp_pref_ssid = pref.getString("ssid");
-  String tmp_pref_pass = pref.getString("pass");
-
-  const char *pref_ssid = tmp_pref_ssid.c_str();
-  const char *pref_pass = tmp_pref_pass.c_str();
-
-  WiFi.persistent(false);
-  WiFi.disconnect(true, true);
-  WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE);
-
-  start_wifi_millis = millis();
-  WiFi.begin(pref_ssid, pref_pass);
-
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    digitalWrite(RED_BACKSIDE_LED,LOW);
-    delay(125);
-    Serial.print(".");
-    digitalWrite(RED_BACKSIDE_LED,HIGH);
-    delay(125);
-
-    if (millis() - start_wifi_millis > timeout)
-    {
-      WiFi.disconnect(true, true);
-      Serial.println();
-      return false;
-    }
-  }
-  Serial.println();
-  return true;
 }
 
 void cameraInit()
@@ -300,6 +258,42 @@ void cameraInit()
 #endif
 }
 
+bool wifiConnect(long timeout)
+{
+  long start_wifi_millis;
+
+  String tmp_pref_ssid = pref.getString("ssid");
+  String tmp_pref_pass = pref.getString("pass");
+
+  const char *pref_ssid = tmp_pref_ssid.c_str();
+  const char *pref_pass = tmp_pref_pass.c_str();
+
+  WiFi.persistent(false);
+  WiFi.disconnect(true, true);
+  WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE);
+
+  start_wifi_millis = millis();
+  WiFi.begin(pref_ssid, pref_pass);
+
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(125);
+    digitalToggle(RED_BACKSIDE_LED);
+    Serial.print(".");
+    delay(125);
+    digitalToggle(RED_BACKSIDE_LED);
+
+    if (millis() - start_wifi_millis > timeout)
+    {
+      WiFi.disconnect(true, true);
+      Serial.println();
+      return false;
+    }
+  }
+  Serial.println();
+  return true;
+}
+
 int wifiScanNetworks()
 {
   WiFi.mode(WIFI_STA);
@@ -329,25 +323,6 @@ int wifiScanNetworks()
   }
 
   return n;
-}
-
-String BTinp()
-{
-  String inp = "";
-
-  while (true)
-  {
-    if (SerialBT.available())
-    {
-      inp = (SerialBT.readStringUntil('\n'));
-      break;
-    }
-  }
-  inp.replace("\n", "");
-  inp.replace("\r", "");
-  inp.replace("\t", "");
-  inp.trim();
-  return inp;
 }
 
 void WIFIPrintStatus(int status)
@@ -380,6 +355,30 @@ void WIFIPrintStatus(int status)
     Serial.println(F("WL_NO_SHIELD      "));
     break;
   }
+}
+
+void digitalToggle(uint8_t PIN)
+{
+  digitalWrite(PIN, (digitalRead(PIN) == LOW ? HIGH : LOW));
+}
+
+String BTinp()
+{
+  String inp = "";
+
+  while (true)
+  {
+    if (SerialBT.available())
+    {
+      inp = (SerialBT.readStringUntil('\n'));
+      break;
+    }
+  }
+  inp.replace("\n", "");
+  inp.replace("\r", "");
+  inp.replace("\t", "");
+  inp.trim();
+  return inp;
 }
 
 #ifdef NVINIT
