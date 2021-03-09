@@ -1,4 +1,3 @@
-
 #include <Arduino.h>
 #include <WiFi.h>
 #include <ESPmDNS.h>
@@ -8,13 +7,10 @@
 #include "BluetoothSerial.h"
 #include <String.h>
 
-
-
 #ifdef NVINIT
 #include "nvs_flash.h"
 #include "nvs.h"
 #endif
-
 //
 // WARNING!!! PSRAM IC required for UXGA resolution and high JPEG quality
 //            Ensure ESP32 Wrover Module or other board with PSRAM is selected
@@ -39,23 +35,23 @@
 //#define CAMERA_MODEL_M5STACK_WIDE // Has PSRAM
 //#define CAMERA_MODEL_M5STACK_ESP32CAM // No PSRAM
 #define CAMERA_MODEL_AI_THINKER // Has PSRAM
-//#define CAMERA_MODEL_TTGO_T_JOURNAL // No PSRAM
-#include "camera_pins.h"
-
-//
-#define MYNAME "ESPCAM00"
-#define MYVERSION "FW:V3-202103091800"
 //
 // AiTinker specific
 //
 #define RED_BACKSIDE_LED 33
 #define FLASHLIGHT_LED    4
 
-uint8_t LEDSTAT=0x0;
+//#define CAMERA_MODEL_TTGO_T_JOURNAL // No PSRAM
+
+
+#include "camera_pins.h"
+
+#define MYNAME "ESPCAM00"
+#define MYVERSION "FW:V3-202103091800"
+
 
 Preferences pref;
 BluetoothSerial SerialBT;
-
 
 String ssids_array[50];
 String network_string;
@@ -63,12 +59,12 @@ String network_string;
 String BTinp();
 int wifiScanNetworks();
 
-
 void startCameraServer();
 bool wifiConnect(long timeout);
 void WIFIPrintStatus(int status);
 void cameraInit();
 
+uint8_t LEDSTAT=0x0;
 int wifistat = 0;
 
 void setup()
@@ -106,8 +102,8 @@ void setup()
     Serial.println("Bluetooth waiting for connect. My name_:");
     while (!SerialBT.connected(5000))
     {
-    LEDSTAT=(LEDSTAT == LOW) ? HIGH : LOW;
-    digitalWrite(RED_BACKSIDE_LED,LEDSTAT);
+      LEDSTAT=(LEDSTAT == LOW) ? HIGH : LOW;
+      digitalWrite(RED_BACKSIDE_LED,LEDSTAT);
       Serial.print("#");
       Serial.println(MYNAME);
     }
@@ -168,7 +164,6 @@ void setup()
   Serial.print("IP_:");
   Serial.println(WiFi.localIP());
 
-
   if (!MDNS.begin(MYNAME))
     Serial.println("Error setting up MDNS responder!");
 
@@ -197,7 +192,6 @@ void loop()
   {
     i = 0;
   }
-
   delay(10000);
 }
 
