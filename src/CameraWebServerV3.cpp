@@ -19,7 +19,6 @@
 
 // cleaning :       pio run --target erase
 
-// C:\Users\la\.platformio\packages\framework-arduinoespressif32\tools\partitions\huge_app2.csv:
 //
 // # Name     Type  SubType     Offset   Size   Flags
 // nvs,       data,  nvs,       0x9000,   0x5000,
@@ -44,7 +43,7 @@
 
 #include "camera_pins.h"
 
-#define MYNAME "ESPCAM00"
+#define MYNAME "ESPCAM01"
 #define MYVERSION "FW:V3-202103091800"
 
 Preferences pref;
