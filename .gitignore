@@ -359,6 +359,12 @@ MigrationBackup/
 
 .vscode/c_cpp_properties.json
 .vscode/launch.json
+<<<<<<< HEAD
 .pio/build/project.checksum
 .vscode/c_cpp_properties.json
 .vscode/launch.json
+=======
+.vscode/c_cpp_properties.json
+.vscode/launch.json
+*.checksum
+>>>>>>> 2b84647e2a089b25a254650072f6a1b8b40340bb
