@@ -8,8 +8,8 @@
         {
             "name": "PlatformIO",
             "includePath": [
-                "z:/1_Privat/Arduino/ESP32/ESP32CamV3/include",
-                "z:/1_Privat/Arduino/ESP32/ESP32CamV3/src",
+                "z:/la/Privat/Arduino/ESP32/ESP32CamV3/include",
+                "z:/la/Privat/Arduino/ESP32/ESP32CamV3/src",
                 "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/Preferences/src",
                 "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/ESPmDNS/src",
                 "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src",
@@ -107,8 +107,8 @@
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
-                    "z:/1_Privat/Arduino/ESP32/ESP32CamV3/include",
-                    "z:/1_Privat/Arduino/ESP32/ESP32CamV3/src",
+                    "z:/la/Privat/Arduino/ESP32/ESP32CamV3/include",
+                    "z:/la/Privat/Arduino/ESP32/ESP32CamV3/src",
                     "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/Preferences/src",
                     "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/ESPmDNS/src",
                     "C:/Users/la/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src",
