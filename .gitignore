@@ -10,6 +10,8 @@
 *.userosscache
 *.sln.docstates
 .pio/
+.pio/build/
+*.bak
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -387,3 +389,4 @@ FodyWeavers.xsd
 # JetBrains Rider
 .idea/
 *.sln.i
+.pio/build/project.checksum
